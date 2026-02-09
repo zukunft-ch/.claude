@@ -35,6 +35,8 @@
 - **FR** (`/fr/`) — `le-futur.ch` (proxied via Cloudflare Worker)
 - **IT** (`/it/`) — `il-futuro.ch` (proxied via Cloudflare Worker)
 - **EN** (`/en/`) — `die-zukunft.ch/en/` (no separate domain)
+- **Worldwide movement** — `the-future.world` (separate static app)
+- **Verein (association)** — `collective.die-zukunft.ch` (separate static app)
 
 ## Deployment — Cloudflare Pages + Workers
 
