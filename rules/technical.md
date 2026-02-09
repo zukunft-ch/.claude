@@ -43,11 +43,11 @@ cd ../../avenir && git checkout -- . && git pull
 
 ## Template structure (`avenir/templates/`)
 - `base.html` — master layout: head (SwissCross Canvas 2D renderer + Fontshare font links), meta, nav, plasma WebGL, sparkle, progress tracker, to-top, service worker registration, all shared JS
-- `index.html` — landing page (extends base): hero, subtitle, carousel, changes, timeline, CTA
+- `index.html` — landing page (extends base): hero, subtitle, changes (intro + 4 bento cards + CTA), carousel, timeline, CTA
 - `page.html` — generic content page (extends base)
 - Specialized: `vision.html`, `programm.html`, `grundeinkommen.html`, `kontakt.html`, `mitmachen.html`, `info.html`
 - `macros/nav.html` — topnav + sparkle button macros
-- `macros/footer.html` — site footer
+- `macros/footer.html` — site footer (Verein, Spenden, The Future worldwide, movement pill CTA)
 - `macros/jsonld.html` — structured data macros
 - `macros/pillar_cards.html` — pillar card rendering
 
@@ -57,8 +57,8 @@ cd ../../avenir && git checkout -- . && git pull
 - Single offscreen WebGL canvas renders animated plasma, drawn into per-section 2D canvases
 - 4 color presets per theme cycle across sections (light: pastel, dark: rich)
 - Shader uniforms: `u_scale` (color range), `u_lift` (brightness floor), `u_saturation`
-- Speed: `u_time * 0.08` (~78s per cycle)
-- On `body.plasma-active`, sections use semi-transparent `--canvas-tint-*` gradients
+- Speed: `u_time * 0.12` (~52s per cycle)
+- On `body.plasma-active`, sections use `overflow: clip` (NOT `hidden` — `hidden` clips content in taller-than-viewport sections)
 - Graceful degradation: no-JS or no-WebGL falls back to opaque CSS gradients
 - Respects `prefers-reduced-motion: reduce`
 - `powerPreference: 'low-power'`, DPR capped at 1.5
@@ -96,6 +96,9 @@ cd ../../avenir && git checkout -- . && git pull
 - **Canvas sections height**: Use `min-height` (not `height`) so tall sections like footer can exceed viewport without scroll-snap fighting.
 - **iOS Safari theme-color**: `setAttribute('content', ...)` on `<meta name="theme-color">` does NOT update Safari browser chrome. Must remove and re-insert the element.
 - **iOS Safari scroll-snap + preventDefault**: `e.preventDefault()` on `touchmove` does not reliably block scroll-snap. Use `overflow: hidden` + `scroll-snap-type: none` on `<html>` instead.
+- **Plasma overflow**: Use `overflow: clip` (not `hidden`) on `body.plasma-active .canvas` — `hidden` clips content in sections with 2+ rows of cards that exceed viewport height.
+- **Bento grid**: 2x2 layout (`repeat(2, 1fr)`), stacks to 1-col on mobile (`$bp-sm`). No first-child span.
+- **SCSS radius variables**: `$radius-sm` (6px), `$radius-md` (12px), `$radius-lg` (20px), `$radius-pill` (100px). There is NO `$radius-full`.
 
 ## Cloudflare Worker (`worker/`)
 - **Name**: `lang-proxy`
@@ -115,7 +118,7 @@ cd ../../avenir && git checkout -- . && git pull
 - `site.webmanifest` — `display: standalone`, icons (SVG any, 192 PNG, 512 PNG, 512 maskable)
 - `sw.js` — service worker: caches shell on install, network-first fetch with cache fallback
 - `icon-192.png`, `icon-512.png` — PWA icons (scaled from apple-touch-icon)
-- Cache name: `dz-v1` — bump version to invalidate
+- Cache name: `dz-v2` — bump version to invalidate
 
 ## OG image generation
 Requires: `rsvg-convert` (librsvg), Python 3, fonttools + brotli.
