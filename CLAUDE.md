@@ -63,7 +63,8 @@ The main domain `die-zukunft.ch` is served directly by Pages (no Worker).
 ### Static headers & redirects
 - `static/_headers` — security headers (CSP, HSTS, X-Frame-Options, Permissions-Policy)
 - `static/_redirects` — `www.die-zukunft.ch` → `die-zukunft.ch` (301)
-- CSP allows: `cdn.jsdelivr.net` (Three.js), `formspree.io` (contact form)
+- CSP allows: `api.fontshare.com` (font CSS), `cdn.fontshare.com` (font files), `formspree.io` (contact form)
+- **HTTPS redirect**: Enable "Always Use HTTPS" in Cloudflare dashboard for each zone (die-zukunft.ch, le-futur.ch, il-futuro.ch)
 
 ### DNS records (Cloudflare-managed)
 All three domains (`die-zukunft.ch`, `le-futur.ch`, `il-futuro.ch`) are on Cloudflare DNS. Pages custom domain is `die-zukunft.ch`. Worker routes handle `le-futur.ch` and `il-futuro.ch`.
@@ -99,5 +100,5 @@ Every page section gets a unique hex anchor (`0xPPSS`) displayed in the top-left
 - **Tone**: Pragmatic, confident, Swiss-serious. No sci-fi, no culture-war, no climate framing.
 - **Brandmark**: "Die Zukunft." / "Le Futur." / "Il Futuro." / "The Future." (always with period)
 - **Visual identity**: 3D wireframe Swiss cross, purple→blue→cyan gradient
-- **Fonts**: Clash Display (brandmark), Switzer (headlines), Mozilla Headline (body)
+- **Fonts**: Clash Display (brandmark), Switzer (headlines) — loaded via `<link>` tags from Fontshare CDN (NOT CSS `@import`)
 - **Brand colors**: Purple `#a855f7`, Blue `#3b82f6`, Teal `#06b6d4`

@@ -42,7 +42,7 @@ cd ../../avenir && git checkout -- . && git pull
 - **Theme default**: Light (not system preference). Dark mode only activates when user explicitly toggles it.
 
 ## Template structure (`avenir/templates/`)
-- `base.html` — master layout: head, meta, nav, plasma WebGL, sparkle, progress tracker, to-top, Three.js SwissCross, service worker registration, all shared JS
+- `base.html` — master layout: head (SwissCross Canvas 2D renderer + Fontshare font links), meta, nav, plasma WebGL, sparkle, progress tracker, to-top, service worker registration, all shared JS
 - `index.html` — landing page (extends base): hero, subtitle, carousel, changes, timeline, CTA
 - `page.html` — generic content page (extends base)
 - Specialized: `vision.html`, `programm.html`, `grundeinkommen.html`, `kontakt.html`, `mitmachen.html`, `info.html`
@@ -63,13 +63,16 @@ cd ../../avenir && git checkout -- . && git pull
 - Respects `prefers-reduced-motion: reduce`
 - `powerPreference: 'low-power'`, DPR capped at 1.5
 
-### SwissCross.create() (Three.js)
-- Three.js wireframe cross renderer with configurable `arm`, `thick`, `cameraZ`, `cubeSize`, `fov`, `camX`, `camY`, `opacity`
-- Used in hero (large), topnav logo (small), footer (medium)
-- On mobile (< 768px): nav and footer meshes are skipped to save GPU memory
-- On mobile: antialias disabled, DPR capped at 1.5, `powerPreference: 'low-power'`
+### SwissCross.create() (Canvas 2D — no WebGL)
+- Pure Canvas 2D wireframe cross renderer (replaced Three.js in Feb 2026)
+- Configurable: `arm`, `thick`, `cameraZ`, `cubeSize`, `fov`, `camX`, `camY`, `opacity`
+- Used in hero (large), topnav logo (small), footer (medium) — all devices including mobile
+- No WebGL context limits — runs everywhere with 2D canvas
+- Defined in `<head>` of `base.html` so it's available before content block scripts
+- Perspective projection: `buildPositions()` → cube edge pairs → `rotatePoint()` → `project()` → `ctx.lineTo()`
 - Theme-aware: MutationObserver updates color/opacity on `data-theme` change
 - IntersectionObserver pauses animation when offscreen
+- No external JS dependencies (Three.js CDN removed)
 
 ### Other JS systems
 - **Sparkle overlay** — open/close with focus trap, search filtering, live region
@@ -85,9 +88,12 @@ cd ../../avenir && git checkout -- . && git pull
 - **Theme submodule**: `themes/avenir/` is a git submodule with its own working tree — edits to `../avenir/` (standalone clone) are NOT picked up by `zola build`. Always edit files under `themes/avenir/` for Zola to use them.
 - `position: fixed` inside a `backdrop-filter` parent positions relative to the parent, not viewport. That's why sparkle button has two elements (desktop fixed + mobile inline).
 - Tera `self::` macro references don't work in imported macros — inline the code.
-- Three.js canvas needs non-zero dimensions at init time. Use `transform: scale(0)` instead of `width: 0` to hide elements that contain canvases.
-- Fontshare CDN web fonts have `"false"` as family name. If using them locally (e.g., for OG image generation), patch with fonttools first.
-- **iOS Safari WebGL**: Multiple WebGL contexts compete for GPU memory. On mobile, only plasma + hero mesh run (nav/footer meshes skipped). DPR is capped at 1.5 and antialias is disabled.
+- **Script ordering in base.html**: `SwissCross` must be defined in `<head>` — content block scripts (e.g. index.html hero init) execute before body-end scripts.
+- **CSS @import for fonts**: Don't use `@import url(...)` in SCSS for CDN fonts — iOS Safari + service workers can cause double round-trip failures. Use `<link rel="stylesheet">` tags in `<head>` instead.
+- **CSP for fonts**: `font-src` and `style-src` must include Fontshare CDN origins (`api.fontshare.com`, `cdn.fontshare.com`) or fonts silently fail.
+- Fontshare CDN web fonts have `"false"` as family name locally. If using them for OG image generation, patch with fonttools first.
+- **Scroll-snap**: Use `y proximity` (not `mandatory`) + `scroll-behavior: smooth` for natural feel. `mandatory` causes jarring instant snaps on iOS.
+- **Canvas sections height**: Use `min-height` (not `height`) so tall sections like footer can exceed viewport without scroll-snap fighting.
 - **iOS Safari theme-color**: `setAttribute('content', ...)` on `<meta name="theme-color">` does NOT update Safari browser chrome. Must remove and re-insert the element.
 - **iOS Safari scroll-snap + preventDefault**: `e.preventDefault()` on `touchmove` does not reliably block scroll-snap. Use `overflow: hidden` + `scroll-snap-type: none` on `<html>` instead.
 
@@ -128,7 +134,7 @@ f.save('output.ttf')
 Then generate: create SVG with wireframe lines from favicon.svg, add text, convert via `rsvg-convert -w 1200 -h 630`.
 
 ## Favicon generation
-The favicon SVG is generated from the Three.js SwissCross projection (arm=1, thick=0, fov=35, cameraZ=7, rotation 0.4/0.6). Coordinates are computed via Python perspective projection matching the JS renderer. Source of truth is `avenir/static/favicon.svg`. The site's `static/` should NOT contain a `favicon.svg` override — it falls through to the theme's version.
+The favicon SVG is generated from the SwissCross projection (arm=1, thick=0, fov=35, cameraZ=7, rotation 0.4/0.6). Coordinates are computed via Python perspective projection matching the Canvas 2D renderer. Source of truth is `avenir/static/favicon.svg`. The site's `static/` should NOT contain a `favicon.svg` override — it falls through to the theme's version.
 
 ## Adding a new page
 1. Create `content/page-name.md` with TOML frontmatter (set `template = "page.html"`)
