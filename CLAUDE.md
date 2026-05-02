@@ -92,9 +92,15 @@ Every page section gets a unique hex anchor (`0xPPSS`) displayed in the top-left
 |---|---|---|
 | `0x00__`–`0x0F__` | Core nav | `0x00` Home, `0x01` Vision, `0x02` Programm, `0x03` Mitmachen |
 | `0x10__`–`0x1F__` | Framing | `0x10` Manifest, `0x11` Kein links/rechts |
-| `0x20__`–`0x3F__` | Pillars | `0x20` Digitale Souveränität, `0x21` Robotik, `0x22` Übergänge, `0x23` Life Science, `0x24` Grundeinkommen, `0x25` Städte & Wohnen, `0x26` Research & Innovation, `0x27` Energy & Resilience, `0x28` Offener Staat, `0x29` Neutralität & Frieden, `0x2A` Talent & Integration, `0x2B` Sprache & Verständigung |
+| `0x20__`–`0x2F__` | Pillars | `0x20` Digitale Souveränität, `0x21` Robotik, `0x22` Übergänge, `0x23` Life Science, `0x24` Grundeinkommen, `0x25` Städte & Wohnen, `0x26` Research & Innovation, `0x27` Energy & Resilience, `0x28` Offener Staat, `0x29` Neutralität & Frieden, `0x2A` Talent & Integration, `0x2B` Sprache & Verständigung |
+| `0x30__`–`0x3F__` | Zukunftslabor | `0x30` Zukunftslabor, `0x31` Notizen, `0x32` Methodik |
 | `0x40__`–`0x4F__` | People & community | `0x40` Menschen, `0x41` Kontakt |
-| `0xF0__`–`0xFF__` | Legal & meta | `0xF0` Impressum, `0xF1` Datenschutz, `0xF2` Info, `0xF3` Aktuelles |
+| `0x50__`–`0x5F__` | Aktuelles articles | `0x50` Platz 1 ist kein Plan |
+| `0xF0__`–`0xFF__` | Legal & meta | `0xF0` Impressum, `0xF1` Datenschutz, `0xF2` Info, `0xF3` Aktuelles (index) |
+
+**Section-level meta slots**: within any page, `0xPPF0`–`0xPPFF` is reserved for cross-cutting auxiliary sections (banners, overlays, ephemera) so adding/removing one does not shift the addresses of the page's primary sections. Mark such sections with a `data-hex="0xPPFn"` attribute; the hex-anchor JS skips them in the auto-counter so primary sections keep stable addresses.
+
+**Stability rule**: once assigned, a page or section hex address must not change. New pages take the next free index in the appropriate range; if a page is removed, leave its slot retired (don't reuse).
 
 **Adding a new page**: Append to the appropriate category in `hexMap` (next free index). Each page gets 256 section slots.
 
