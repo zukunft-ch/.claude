@@ -6,19 +6,19 @@
 ## Repos
 
 ### `die-zukunft.ch` — The Zola website
-- **Stack**: Zola 0.19.2 (Rust static site generator) + Tera templates
+- **Stack**: Zola 0.22.1 (Rust static site generator) + Tera templates
 - **Content**: `content/*.md` — Markdown with TOML frontmatter (`+++...+++`)
 - **Config**: `config.toml` — base URL, languages, translations, extra vars
 - **Static**: `static/` — fonts, OG images, robots.txt, favicon, PWA icons, service worker
 - **Theme**: `themes/avenir` — git submodule pointing to `github.com/zukunft-ch/avenir`
 - **Worker**: `worker/` — Cloudflare Worker for multi-domain language proxy
-- **Build**: `zola build` → `public/` (or `mise run build`)
-- **Serve**: `zola serve` (or `mise run dev`)
+- **Build**: `mise run build` (or `mise exec -- zola build`) → `public/`. Zola is pinned to 0.22.1; the Homebrew `zola` on PATH is 0.23.x (Tera v2, no shortcodes/macros) and FAILS on this theme — never build with a bare `zola`.
+- **Serve**: `mise run dev` (or `mise exec -- zola serve`)
 - **Task runner**: mise (optional, see `mise.toml`)
 
 ### `avenir` — The Zola theme
 - **Templates**: `templates/` — Tera HTML (base.html, page.html, index.html, etc.)
-- **Macros**: `templates/macros/` — nav, footer, jsonld, pillar_cards
+- **Macros**: `templates/macros/` — nav, footer, jsonld, pillar_cards, icons (`icons::icon(name=item.icon)` maps the emoji `icon` keys in content to brand-gradient line SVGs via `#icon-gradient` in base.html; unknown values fall back to the raw emoji — add a branch there when content uses a new emoji)
 - **Shortcodes**: `templates/shortcodes/` — faq, callout, newsletter_form
 - **Styles**: `sass/` — SCSS (main.scss imports _variables, _reset, _theme, _typography, _layout, _components)
 - **Static**: `static/` — favicon.svg (3D wireframe Swiss cross), fonts/
@@ -65,7 +65,7 @@ The main domain `die-zukunft.ch` is served directly by Pages (no Worker).
 ### Static headers & redirects
 - `static/_headers` — security headers (CSP, HSTS, X-Frame-Options, Permissions-Policy)
 - `static/_redirects` — `www.die-zukunft.ch` → `die-zukunft.ch` (301)
-- CSP allows: `api.fontshare.com` (font CSS), `cdn.fontshare.com` (font files), `formspree.io` (contact form)
+- CSP is strict same-origin: fonts self-hosted, styles/scripts inline+`'self'`; the only external origin is `connect-src https://api.die-zukunft.ch` (the form-handler worker). No third-party font/CDN origins.
 - **HTTPS redirect**: Enable "Always Use HTTPS" in Cloudflare dashboard for each zone (die-zukunft.ch, le-futur.ch, il-futuro.ch)
 
 ### DNS records (Cloudflare-managed)
@@ -92,10 +92,10 @@ Every page section gets a unique hex anchor (`0xPPSS`) displayed in the top-left
 |---|---|---|
 | `0x00__`–`0x0F__` | Core nav | `0x00` Home, `0x01` Vision, `0x02` Programm, `0x03` Mitmachen |
 | `0x10__`–`0x1F__` | Framing | `0x10` Manifest, `0x11` Kein links/rechts |
-| `0x20__`–`0x2F__` | Pillars | `0x20` Digitale Souveränität, `0x21` Robotik, `0x22` Übergänge, `0x23` Life Science, `0x24` Grundeinkommen, `0x25` Städte & Wohnen, `0x26` Research & Innovation, `0x27` Energy & Resilience, `0x28` Offener Staat, `0x29` Neutralität & Frieden, `0x2A` Talent & Integration, `0x2B` Sprache & Verständigung |
+| `0x20__`–`0x2F__` | Pillars | `0x20` Digitale Souveränität, `0x21` Robotik, `0x22` Übergänge, `0x23` Life Science, `0x24` Grundeinkommen, `0x25` Städte & Wohnen, `0x26` Research & Innovation, `0x27` Energy & Resilience, `0x28` Offener Staat, `0x29` Neutralität & Frieden, `0x2A` Talent & Integration, `0x2B` Sprache & Verständigung, `0x2C` Souveräne KI & Rechenkraft (Nov 2026; shown first in the programme) |
 | `0x30__`–`0x3F__` | Zukunftslabor | `0x30` Zukunftslabor, `0x31` Notizen, `0x32` Methodik |
 | `0x40__`–`0x4F__` | People & community | `0x40` Menschen, `0x41` Kontakt, `0x42` Abstimmungen |
-| `0x50__`–`0x5F__` | Aktuelles articles | `0x50` Platz 1 ist kein Plan, `0x51` Abstimmung 14. Juni 2026 |
+| `0x50__`–`0x5F__` | Aktuelles articles | `0x50` Platz 1 ist kein Plan, `0x51` Abstimmung 14. Juni 2026, `0x52` Der Engpass sind die Daten, `0x53` 1. August 2026, `0x54` Abstimmung 27. September 2026, `0x55` Abstimmung 29. November 2026 |
 | `0xF0__`–`0xFF__` | Legal & meta | `0xF0` Impressum, `0xF1` Datenschutz, `0xF2` Info, `0xF3` Aktuelles (index) |
 
 **Section-level meta slots**: within any page, `0xPPF0`–`0xPPFF` is reserved for cross-cutting auxiliary sections (banners, overlays, ephemera) so adding/removing one does not shift the addresses of the page's primary sections. Mark such sections with a `data-hex="0xPPFn"` attribute; the hex-anchor JS skips them in the auto-counter so primary sections keep stable addresses.
@@ -107,6 +107,6 @@ Every page section gets a unique hex anchor (`0xPPSS`) displayed in the top-left
 ## Brand
 - **Tone**: Pragmatic, confident, Swiss-serious. No sci-fi, no culture-war, no climate framing.
 - **Brandmark**: "Die Zukunft." / "Le Futur." / "Il Futuro." / "The Future." (always with period)
-- **Visual identity**: 3D wireframe Swiss cross, purple→blue→cyan gradient
-- **Fonts**: Clash Display (brandmark), Switzer (headlines) — loaded via `<link>` tags from Fontshare CDN (NOT CSS `@import`)
-- **Brand colors**: Purple `#a855f7`, Blue `#3b82f6`, Teal `#06b6d4`
+- **Visual identity** (Nov 2026): 3D wireframe Swiss cross; brand icon = "Würfelkreuz, klar" (7-cube hidden-line cross); "Alpenglühen" gradient
+- **Fonts**: Clash Display (brandmark), Switzer (headlines), Mozilla Headline (body) — all self-hosted woff2 in `static/fonts/`, `@font-face` in theme `_typography.scss` (no third-party CDN)
+- **Brand colors** ("Alpenglühen"): Rose `#f43f5e` → Magenta `#c026d3` → Violet `#6d28d9` → Indigo `#4338ca` (dark-mode tints `#fb7185 #e879f9 #a78bfa #818cf8`). Single source: `--brand-*` CSS variables in `avenir/sass/_theme.scss`. Wordmark = form "01" (Clash Display 700, lowercase, gradient incl. the full stop). The red full stop was tried and retired.
