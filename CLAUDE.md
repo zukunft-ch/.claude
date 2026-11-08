@@ -93,7 +93,8 @@ Every page section gets a unique hex anchor (`0xPPSS`) displayed in the top-left
 | `0x00__`–`0x0F__` | Core nav | `0x00` Home, `0x01` Vision, `0x02` Programm, `0x03` Mitmachen |
 | `0x10__`–`0x1F__` | Framing | `0x10` Manifest, `0x11` Kein links/rechts |
 | `0x20__`–`0x2F__` | Pillars | `0x20` Digitale Souveränität, `0x21` Robotik, `0x22` Übergänge, `0x23` Life Science, `0x24` Grundeinkommen, `0x25` Städte & Wohnen, `0x26` Research & Innovation, `0x27` Energy & Resilience, `0x28` Offener Staat, `0x29` Neutralität & Frieden, `0x2A` Talent & Integration, `0x2B` Sprache & Verständigung, `0x2C` Souveräne KI & Rechenkraft (Nov 2026; shown first in the programme) |
-| `0x30__`–`0x3F__` | Zukunftslabor | `0x30` Zukunftslabor, `0x31` Notizen, `0x32` Methodik |
+| `0x30__`–`0x3F__` | Zukunftslabor | `0x30` Zukunftslabor, `0x31` Notizen, `0x32` Methodik, … `0x3D` Zukunftsmonitor, `0x3E` Dossiers |
+| `0x60__`–`0x6F__` | Zukunftslabor II (notes from Nov 2026) | `0x60` AGI-Szenarien Arbeitsmarkt, `0x61` E-Government Rang 26, `0x62` Rechenkraft & Strom, `0x63` Roboterdichte verdoppeln, `0x64` Talentvisa im Vergleich, `0x65` Transparent per Gesetz |
 | `0x40__`–`0x4F__` | People & community | `0x40` Menschen, `0x41` Kontakt, `0x42` Abstimmungen |
 | `0x50__`–`0x5F__` | Aktuelles articles | `0x50` Platz 1 ist kein Plan, `0x51` Abstimmung 14. Juni 2026, `0x52` Der Engpass sind die Daten, `0x53` 1. August 2026, `0x54` Abstimmung 27. September 2026, `0x55` Abstimmung 29. November 2026, `0x56` Ein neues Gesicht (Rebrand) |
 | `0xF0__`–`0xFF__` | Legal & meta | `0xF0` Impressum, `0xF1` Datenschutz, `0xF2` Info, `0xF3` Aktuelles (index) |
